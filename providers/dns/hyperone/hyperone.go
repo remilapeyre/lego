@@ -40,13 +40,13 @@ type Config struct {
 }
 
 // NewDefaultConfig returns a default configuration for the DNSProvider.
-func NewDefaultConfig() *Config {
+func NewDefaultConfig(conf map[string]string) *Config {
 	return &Config{
-		TTL:                env.GetOrDefaultInt(EnvTTL, dns01.DefaultTTL),
-		PropagationTimeout: env.GetOrDefaultSecond(EnvPropagationTimeout, dns01.DefaultPropagationTimeout),
-		PollingInterval:    env.GetOrDefaultSecond(EnvPollingInterval, dns01.DefaultPollingInterval),
+		TTL:                env.GetOrDefaultInt(conf, EnvTTL, dns01.DefaultTTL),
+		PropagationTimeout: env.GetOrDefaultSecond(conf, EnvPropagationTimeout, dns01.DefaultPropagationTimeout),
+		PollingInterval:    env.GetOrDefaultSecond(conf, EnvPollingInterval, dns01.DefaultPollingInterval),
 		HTTPClient: &http.Client{
-			Timeout: env.GetOrDefaultSecond(EnvHTTPTimeout, 30*time.Second),
+			Timeout: env.GetOrDefaultSecond(conf, EnvHTTPTimeout, 30*time.Second),
 		},
 	}
 }
@@ -58,12 +58,12 @@ type DNSProvider struct {
 }
 
 // NewDNSProvider returns a DNSProvider instance configured for HyperOne.
-func NewDNSProvider() (*DNSProvider, error) {
-	config := NewDefaultConfig()
+func NewDNSProvider(conf map[string]string) (*DNSProvider, error) {
+	config := NewDefaultConfig(conf)
 
-	config.PassportLocation = env.GetOrFile(EnvPassportLocation)
-	config.LocationID = env.GetOrFile(EnvLocationID)
-	config.APIEndpoint = env.GetOrFile(EnvAPIUrl)
+	config.PassportLocation = env.GetOrFile(conf, EnvPassportLocation)
+	config.LocationID = env.GetOrFile(conf, EnvLocationID)
+	config.APIEndpoint = env.GetOrFile(conf, EnvAPIUrl)
 
 	return NewDNSProviderConfig(config)
 }
